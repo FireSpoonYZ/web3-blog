@@ -21,7 +21,7 @@ export function getBlogProgramId(cluster: Cluster) {
     case 'devnet':
     case 'testnet':
       // This is the program ID for the Blog program on devnet and testnet.
-      return new PublicKey('coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF')
+      return new PublicKey('59Zq8Bdg2wviDFyYCprbAWX93u1kbAPjKcWTeLzayzCY')
     case 'mainnet-beta':
     default:
       return BLOG_PROGRAM_ID

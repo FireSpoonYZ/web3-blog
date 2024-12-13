@@ -2,69 +2,119 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+declare_id!("59Zq8Bdg2wviDFyYCprbAWX93u1kbAPjKcWTeLzayzCY");
 
 #[program]
 pub mod blog {
     use super::*;
 
-  pub fn close(_ctx: Context<CloseBlog>) -> Result<()> {
-    Ok(())
-  }
+    pub fn create(
+        ctx: Context<CreateBlog>,
+        id: String,
+        title: String,
+        content: String,
+    ) -> Result<()> {
+        msg!("Blog created.");
+        msg!("id: {}", id);
+        msg!("title: {}", title);
+        msg!("content: {}", content);
 
-  pub fn decrement(ctx: Context<Update>) -> Result<()> {
-    ctx.accounts.blog.count = ctx.accounts.blog.count.checked_sub(1).unwrap();
-    Ok(())
-  }
+        let blog = &mut ctx.accounts.blog;
+        blog.id = id;
+        blog.title = title;
+        blog.content = content;
+        Ok(())
+    }
 
-  pub fn increment(ctx: Context<Update>) -> Result<()> {
-    ctx.accounts.blog.count = ctx.accounts.blog.count.checked_add(1).unwrap();
-    Ok(())
-  }
+    pub fn update(
+        ctx: Context<UpdateBlog>,
+        id: String,
+        title: String,
+        content: String,
+    ) -> Result<()> {
+        msg!("Blog updated.");
+        msg!("id: {}", id);
+        msg!("title: {}", title);
+        msg!("content: {}", content);
 
-  pub fn initialize(_ctx: Context<InitializeBlog>) -> Result<()> {
-    Ok(())
-  }
+        let blog = &mut ctx.accounts.blog;
+        blog.title = title;
+        blog.content = content;
+        Ok(())
+    }
 
-  pub fn set(ctx: Context<Update>, value: u8) -> Result<()> {
-    ctx.accounts.blog.count = value.clone();
-    Ok(())
-  }
+    pub fn delete(
+        _ctx: Context<DeleteBlog>,
+        id: String,
+    ) -> Result<()> {
+        msg!("Blog deleted.");
+        msg!("id: {}", id);
+
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
-pub struct InitializeBlog<'info> {
-  #[account(mut)]
-  pub payer: Signer<'info>,
+#[instruction(id: String, title: String, content: String)]
+pub struct CreateBlog<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
 
-  #[account(
-  init,
-  space = 8 + Blog::INIT_SPACE,
-  payer = payer
-  )]
-  pub blog: Account<'info, Blog>,
-  pub system_program: Program<'info, System>,
+    #[account(
+        init,
+        space = 8 + Blog::INIT_SPACE,
+        payer = signer,
+        seeds = [b"firespoon_blog", signer.key().as_ref(), id.as_bytes()],
+        bump
+    )]
+    pub blog: Account<'info, Blog>,
+    pub system_program: Program<'info, System>,
 }
-#[derive(Accounts)]
-pub struct CloseBlog<'info> {
-  #[account(mut)]
-  pub payer: Signer<'info>,
 
-  #[account(
-  mut,
-  close = payer, // close account and return lamports to payer
-  )]
-  pub blog: Account<'info, Blog>,
-}
 
 #[derive(Accounts)]
-pub struct Update<'info> {
-  #[account(mut)]
-  pub blog: Account<'info, Blog>,
+#[instruction(id: String, title: String, content: String)]
+pub struct UpdateBlog<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        mut,
+        realloc = 8 + Blog::INIT_SPACE,
+        realloc::payer = signer, 
+        realloc::zero = true,
+        seeds = [b"firespoon_blog", signer.key().as_ref(), id.as_bytes()],
+        bump
+    )]
+    pub blog: Account<'info, Blog>,
+    pub system_program: Program<'info, System>,
 }
+
+
+#[derive(Accounts)]
+#[instruction(id: String)]
+pub struct DeleteBlog<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account( 
+        mut, 
+        seeds = [b"firespoon_blog", signer.key().as_ref(), id.as_bytes()],
+        bump,
+        close = signer,
+    )]
+    pub blog: Account<'info, Blog>,
+    pub system_program: Program<'info, System>,
+}
+
 
 #[account]
 #[derive(InitSpace)]
 pub struct Blog {
-  count: u8,
+    #[max_len(32)]
+    id: String,
+    #[max_len(50)]
+    title: String,
+    #[max_len(2000)]
+    content: String,
 }
