@@ -10,6 +10,12 @@ import { useCluster } from '../cluster/cluster-data-access'
 import { useAnchorProvider } from '../solana/solana-provider'
 import { useTransactionToast } from '../ui/ui-layout'
 
+interface CreateBlogArgs {
+  id: string;
+  title: string;
+  content: string;
+}
+
 export function useBlogProgram() {
   const { connection } = useConnection()
   const { cluster } = useCluster()
@@ -28,23 +34,25 @@ export function useBlogProgram() {
     queryFn: () => connection.getParsedAccountInfo(programId),
   })
 
-  const initialize = useMutation({
-    mutationKey: ['blog', 'initialize', { cluster }],
-    mutationFn: (keypair: Keypair) =>
-      program.methods.initialize().accounts({ blog: keypair.publicKey }).signers([keypair]).rpc(),
-    onSuccess: (signature) => {
-      transactionToast(signature)
-      return accounts.refetch()
+  const createBlog = useMutation<string, Error, CreateBlogArgs>({
+    mutationKey: [`blog`, `create`, {cluster} ],
+    mutationFn: async ({id, title, content}) => {
+      return program.methods.create(id, title, content).rpc();
     },
-    onError: () => toast.error('Failed to initialize account'),
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      accounts.refetch();
+    },
+    onError: (error) => {
+      toast.error(`Error creating blog: ${error.message}`)
+    }
   })
-
   return {
     program,
     programId,
     accounts,
     getProgramAccount,
-    initialize,
+    createBlog
   }
 }
 
@@ -58,47 +66,37 @@ export function useBlogProgramAccount({ account }: { account: PublicKey }) {
     queryFn: () => program.account.blog.fetch(account),
   })
 
-  const closeMutation = useMutation({
-    mutationKey: ['blog', 'close', { cluster, account }],
-    mutationFn: () => program.methods.close().accounts({ blog: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accounts.refetch()
+  const updateBlog = useMutation<string, Error, CreateBlogArgs>({
+    mutationKey: [`blog`, `update`, {cluster} ],
+    mutationFn: async ({id, title, content}) => {
+      return program.methods.update(id, title, content).rpc();
     },
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      accounts.refetch();
+    },
+    onError: (error) => {
+      toast.error(`Error updating blog: ${error.message}`)
+    }
   })
 
-  const decrementMutation = useMutation({
-    mutationKey: ['blog', 'decrement', { cluster, account }],
-    mutationFn: () => program.methods.decrement().accounts({ blog: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accountQuery.refetch()
+  const deleteBlog = useMutation<string, Error, string>({
+    mutationKey: [`blog`, `delete`, {cluster} ],
+    mutationFn: async (id) => {
+      return program.methods.delete(id).rpc();
     },
-  })
-
-  const incrementMutation = useMutation({
-    mutationKey: ['blog', 'increment', { cluster, account }],
-    mutationFn: () => program.methods.increment().accounts({ blog: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accountQuery.refetch()
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      accounts.refetch();
     },
-  })
-
-  const setMutation = useMutation({
-    mutationKey: ['blog', 'set', { cluster, account }],
-    mutationFn: (value: number) => program.methods.set(value).accounts({ blog: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx)
-      return accountQuery.refetch()
-    },
+    onError: (error) => {
+      toast.error(`Error deleting blog: ${error.message}`)
+    }
   })
 
   return {
     accountQuery,
-    closeMutation,
-    decrementMutation,
-    incrementMutation,
-    setMutation,
+    updateBlog,
+    deleteBlog,
   }
 }

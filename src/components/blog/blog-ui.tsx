@@ -1,23 +1,61 @@
 'use client'
 
-import { Keypair, PublicKey } from '@solana/web3.js'
-import { useMemo } from 'react'
+import { Keypair, Message, PublicKey } from '@solana/web3.js'
+import { useEffect, useMemo, useState } from 'react'
 import { ellipsify } from '../ui/ui-layout'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useBlogProgram, useBlogProgramAccount } from './blog-data-access'
+import { useWallet } from '@solana/wallet-adapter-react'
+import * as uuid from 'uuid'
 
 export function BlogCreate() {
-  const { initialize } = useBlogProgram()
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+
+  const { publicKey } = useWallet()
+  const { createBlog } = useBlogProgram()
+
+  const isFormValid = title.trim() != '' && content.trim() != '';
+
+  const handleSubmit = () => {
+    if (publicKey && isFormValid) {
+      createBlog.mutateAsync({ title, content, id: uuid.v4().replace(/-/g, '') })
+    }
+  }
+
+  if (!publicKey) {
+    return <p>Connect Your wallet.</p>
+  }
 
   return (
-    <button
-      className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync(Keypair.generate())}
-      disabled={initialize.isPending}
-    >
-      Create {initialize.isPending && '...'}
-    </button>
-  )
+    <div>
+      <p>
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="input input-bordered w-full max-w-xs"
+        />
+      </p>
+      <p>
+        <textarea
+          placeholder="Content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="textarea textarea-bordered w-full max-w-xs"
+        />
+        <br></br>
+        <button
+          className="btn btn-xs lg:btn-md btn-primary"
+          onClick={handleSubmit}
+          disabled={createBlog.isPending || !isFormValid}
+        >
+          Create Blog {createBlog.isPending && "..."}
+        </button>
+      </p>
+    </div>
+  );
 }
 
 export function BlogList() {
@@ -54,11 +92,35 @@ export function BlogList() {
 }
 
 function BlogCard({ account }: { account: PublicKey }) {
-  const { accountQuery, incrementMutation, setMutation, decrementMutation, closeMutation } = useBlogProgramAccount({
+  const { accountQuery, updateBlog, deleteBlog } = useBlogProgramAccount({
     account,
   })
 
-  const count = useMemo(() => accountQuery.data?.count ?? 0, [accountQuery.data?.count])
+  const { publicKey } = useWallet();
+  const id = accountQuery.data?.id;
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    if (accountQuery.data) {
+      setContent(accountQuery.data.content ?? "");
+      setTitle(accountQuery.data.title ?? "");
+    }
+  }, [accountQuery.data]); // 只有在accountQuery.data更新时才会执行
+
+  const isFormValid = title.trim() != '' && content.trim() != '';
+
+  const handleSubmit = () => {
+    if (publicKey && isFormValid && id) {
+      updateBlog.mutateAsync({ id, title, content });
+    }
+  };
+
+  if (!publicKey) {
+    return <p>Connect your wallet</p>;
+  }
+
+
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -66,51 +128,58 @@ function BlogCard({ account }: { account: PublicKey }) {
     <div className="card card-bordered border-base-300 border-4 text-neutral-content">
       <div className="card-body items-center text-center">
         <div className="space-y-6">
-          <h2 className="card-title justify-center text-3xl cursor-pointer" onClick={() => accountQuery.refetch()}>
-            {count}
+          <h2
+            className="card-title justify-center text-3xl cursor-pointer"
+            onClick={() => accountQuery.refetch()}
+          >
+            <input
+              placeholder="Update content here"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="textarea textarea-bordered w-full max-w-xs"
+            />
           </h2>
           <div className="card-actions justify-around">
+            <textarea
+              placeholder="Update content here"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="textarea textarea-bordered w-full max-w-xs"
+            />
             <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => incrementMutation.mutateAsync()}
-              disabled={incrementMutation.isPending}
-            >
-              Increment
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
+              className="btn btn-xs lg:btn-md btn-primary"
               onClick={() => {
-                const value = window.prompt('Set value to:', count.toString() ?? '0')
-                if (!value || parseInt(value) === count || isNaN(parseInt(value))) {
-                  return
-                }
-                return setMutation.mutateAsync(parseInt(value))
+                handleSubmit()
+                accountQuery.refetch()
               }}
-              disabled={setMutation.isPending}
+              disabled={updateBlog.isPending || !isFormValid}
             >
-              Set
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => decrementMutation.mutateAsync()}
-              disabled={decrementMutation.isPending}
-            >
-              Decrement
+              Update Blog {updateBlog.isPending && "..."}
             </button>
           </div>
           <div className="text-center space-y-4">
             <p>
-              <ExplorerLink path={`account/${account}`} label={ellipsify(account.toString())} />
+              <ExplorerLink
+                path={`account/${account}`}
+                label={ellipsify(account.toString())}
+              />
             </p>
             <button
               className="btn btn-xs btn-secondary btn-outline"
               onClick={() => {
-                if (!window.confirm('Are you sure you want to close this account?')) {
-                  return
+                if (
+                  !window.confirm(
+                    "Are you sure you want to close this account?"
+                  )
+                ) {
+                  return;
                 }
-                return closeMutation.mutateAsync()
+                const id = accountQuery.data?.id;
+                if (id) {
+                  return deleteBlog.mutateAsync(id);
+                }
               }}
-              disabled={closeMutation.isPending}
+              disabled={deleteBlog.isPending}
             >
               Close
             </button>
