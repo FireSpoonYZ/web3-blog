@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("59Zq8Bdg2wviDFyYCprbAWX93u1kbAPjKcWTeLzayzCY");
+declare_id!("AF2tVrJGVjLn87v1d4x1frrCSNbBRKumonhmvgjM2T3f");
 
 #[program]
 pub mod blog {
@@ -14,15 +14,17 @@ pub mod blog {
         title: String,
         content: String,
     ) -> Result<()> {
-        msg!("Blog created.");
+        msg!("Blog chunk created.");
         msg!("id: {}", id);
         msg!("title: {}", title);
         msg!("content: {}", content);
 
         let blog = &mut ctx.accounts.blog;
+        blog.owner = *ctx.accounts.signer.key;
         blog.id = id;
         blog.title = title;
-        blog.content = content;
+        blog.content = vec![String::new(); 20];
+        blog.content[0] = content;
         Ok(())
     }
 
@@ -31,6 +33,7 @@ pub mod blog {
         id: String,
         title: String,
         content: String,
+        idx: u64,
     ) -> Result<()> {
         msg!("Blog updated.");
         msg!("id: {}", id);
@@ -39,7 +42,7 @@ pub mod blog {
 
         let blog = &mut ctx.accounts.blog;
         blog.title = title;
-        blog.content = content;
+        blog.content[idx as usize] = content;
         Ok(())
     }
 
@@ -64,7 +67,7 @@ pub struct CreateBlog<'info> {
         init,
         space = 8 + Blog::INIT_SPACE,
         payer = signer,
-        seeds = [b"firespoon_blog", signer.key().as_ref(), id.as_bytes()],
+        seeds = [b"blog", signer.key().as_ref(), id.as_bytes()],
         bump
     )]
     pub blog: Account<'info, Blog>,
@@ -83,7 +86,7 @@ pub struct UpdateBlog<'info> {
         realloc = 8 + Blog::INIT_SPACE,
         realloc::payer = signer, 
         realloc::zero = true,
-        seeds = [b"firespoon_blog", signer.key().as_ref(), id.as_bytes()],
+        seeds = [b"blog", signer.key().as_ref(), id.as_bytes()],
         bump
     )]
     pub blog: Account<'info, Blog>,
@@ -98,8 +101,8 @@ pub struct DeleteBlog<'info> {
     pub signer: Signer<'info>,
 
     #[account( 
-        mut, 
-        seeds = [b"firespoon_blog", signer.key().as_ref(), id.as_bytes()],
+        mut,
+        seeds = [b"blog", signer.key().as_ref(), id.as_bytes()],
         bump,
         close = signer,
     )]
@@ -111,10 +114,11 @@ pub struct DeleteBlog<'info> {
 #[account]
 #[derive(InitSpace)]
 pub struct Blog {
+    owner: Pubkey,
     #[max_len(32)]
     id: String,
     #[max_len(50)]
     title: String,
-    #[max_len(2000)]
-    content: String,
+    #[max_len(20, 500)]
+    content: Vec<String>,
 }

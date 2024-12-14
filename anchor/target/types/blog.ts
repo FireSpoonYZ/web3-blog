@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/blog.json`.
  */
 export type Blog = {
-  "address": "59Zq8Bdg2wviDFyYCprbAWX93u1kbAPjKcWTeLzayzCY",
+  "address": "AF2tVrJGVjLn87v1d4x1frrCSNbBRKumonhmvgjM2T3f",
   "metadata": {
     "name": "blog",
     "version": "0.1.0",
@@ -39,16 +39,6 @@ export type Blog = {
               {
                 "kind": "const",
                 "value": [
-                  102,
-                  105,
-                  114,
-                  101,
-                  115,
-                  112,
-                  111,
-                  111,
-                  110,
-                  95,
                   98,
                   108,
                   111,
@@ -112,16 +102,6 @@ export type Blog = {
               {
                 "kind": "const",
                 "value": [
-                  102,
-                  105,
-                  114,
-                  101,
-                  115,
-                  112,
-                  111,
-                  111,
-                  110,
-                  95,
                   98,
                   108,
                   111,
@@ -177,16 +157,6 @@ export type Blog = {
               {
                 "kind": "const",
                 "value": [
-                  102,
-                  105,
-                  114,
-                  101,
-                  115,
-                  112,
-                  111,
-                  111,
-                  110,
-                  95,
                   98,
                   108,
                   111,
@@ -221,6 +191,10 @@ export type Blog = {
         {
           "name": "content",
           "type": "string"
+        },
+        {
+          "name": "idx",
+          "type": "u64"
         }
       ]
     }
@@ -247,6 +221,10 @@ export type Blog = {
         "kind": "struct",
         "fields": [
           {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
             "name": "id",
             "type": "string"
           },
@@ -256,7 +234,9 @@ export type Blog = {
           },
           {
             "name": "content",
-            "type": "string"
+            "type": {
+              "vec": "string"
+            }
           }
         ]
       }

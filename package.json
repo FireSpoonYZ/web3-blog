@@ -22,12 +22,14 @@
     "@tabler/icons-react": "^3.11.0",
     "@tanstack/react-query": "^5.51.11",
     "@tanstack/react-query-next-experimental": "^5.51.11",
+    "@uiw/react-md-editor": "^4.0.4",
     "daisyui": "^4.12.10",
     "jotai": "^2.9.1",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
+    "react-markdown": "^9.0.1",
     "uuid": "^11.0.3"
   },
   "devDependencies": {

@@ -4,8 +4,8 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletButton } from '../solana/solana-provider'
 import { AppHero, ellipsify } from '../ui/ui-layout'
 import { ExplorerLink } from '../cluster/cluster-ui'
-import { useBlogProgram } from './blog-data-access'
-import { BlogCreate, BlogList } from './blog-ui'
+import { useBlogProgram } from '../blog/blog-data-access'
+import { BlogList } from './blog-list-ui'
 
 export default function BlogFeature() {
   const { publicKey } = useWallet()
@@ -14,7 +14,7 @@ export default function BlogFeature() {
   return publicKey ? (
     <div>
       <AppHero
-        title="Blog"
+        title="List Blog"
         subtitle={
           'Create a new account by clicking the "Create" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (increment, decrement, set, and close).'
         }
@@ -22,7 +22,6 @@ export default function BlogFeature() {
         <p className="mb-6">
           <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
         </p>
-        <BlogCreate />
       </AppHero>
       <BlogList />
     </div>
