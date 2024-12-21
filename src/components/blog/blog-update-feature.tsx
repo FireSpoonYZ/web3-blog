@@ -23,7 +23,6 @@ export default function BlogFeature() {
           <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
         </p>
         <BlogUpdate />
-        <div style={{ height: '2000px' }}></div> {/* 占位符内容 */}
       </AppHero>
     </div>
   ) : (

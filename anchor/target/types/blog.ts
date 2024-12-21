@@ -14,16 +14,74 @@ export type Blog = {
   },
   "instructions": [
     {
-      "name": "create",
+      "name": "createAuthorInfo",
       "discriminator": [
-        24,
-        30,
-        200,
-        40,
+        114,
+        20,
+        15,
+        234,
+        110,
+        217,
+        163,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authorInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "intro",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createBlog",
+      "discriminator": [
+        221,
+        118,
+        241,
         5,
-        28,
-        7,
-        119
+        53,
+        181,
+        90,
+        253
       ],
       "accounts": [
         {
@@ -77,16 +135,135 @@ export type Blog = {
       ]
     },
     {
-      "name": "delete",
+      "name": "createComment",
       "discriminator": [
-        165,
+        236,
+        232,
+        11,
+        180,
+        70,
+        206,
+        73,
+        145
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "comment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "blogId",
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "deleteAuthorInfo",
+      "discriminator": [
         204,
-        60,
-        98,
-        134,
-        15,
-        83,
-        134
+        36,
+        127,
+        95,
+        175,
+        245,
+        46,
+        11
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authorInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deleteBlog",
+      "discriminator": [
+        110,
+        242,
+        46,
+        158,
+        112,
+        4,
+        189,
+        122
       ],
       "accounts": [
         {
@@ -132,16 +309,132 @@ export type Blog = {
       ]
     },
     {
-      "name": "update",
+      "name": "deleteComment",
       "discriminator": [
-        219,
-        200,
-        88,
-        176,
-        158,
-        63,
-        253,
-        127
+        40,
+        183,
+        112,
+        58,
+        215,
+        240,
+        57,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "comment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateAuthorInfo",
+      "discriminator": [
+        86,
+        90,
+        28,
+        55,
+        228,
+        199,
+        106,
+        155
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authorInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "intro",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateBlog",
+      "discriminator": [
+        252,
+        54,
+        5,
+        181,
+        182,
+        6,
+        112,
+        203
       ],
       "accounts": [
         {
@@ -197,9 +490,84 @@ export type Blog = {
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "updateComment",
+      "discriminator": [
+        85,
+        114,
+        118,
+        111,
+        90,
+        37,
+        5,
+        146
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "comment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "authorInfo",
+      "discriminator": [
+        171,
+        139,
+        57,
+        100,
+        0,
+        43,
+        217,
+        232
+      ]
+    },
     {
       "name": "blog",
       "discriminator": [
@@ -212,9 +580,38 @@ export type Blog = {
         207,
         244
       ]
+    },
+    {
+      "name": "comment",
+      "discriminator": [
+        150,
+        135,
+        96,
+        244,
+        55,
+        199,
+        50,
+        65
+      ]
     }
   ],
   "types": [
+    {
+      "name": "authorInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "intro",
+            "type": "string"
+          }
+        ]
+      }
+    },
     {
       "name": "blog",
       "type": {
@@ -237,6 +634,30 @@ export type Blog = {
             "type": {
               "vec": "string"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "comment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "blogId",
+            "type": "string"
+          },
+          {
+            "name": "content",
+            "type": "string"
           }
         ]
       }

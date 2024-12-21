@@ -40,7 +40,7 @@ class MyBlog {
 
   async updateInner(id: string, title: string, content: string, idx: number) {
     await this.program.methods
-      .update(id, title, content, new BN(idx))
+      .updateBlog(id, title, content, new BN(idx))
       .accounts({ signer: this.payer.publicKey })
       .rpc();
   }
@@ -49,7 +49,7 @@ class MyBlog {
     const chunks = chunk(content, chunkSize)
 
     await this.program.methods
-      .create(id, title, chunks[0])
+      .createBlog(id, title, chunks[0])
       .accounts({ signer: this.payer.publicKey })
       .rpc();
 
@@ -68,7 +68,7 @@ class MyBlog {
 
   async deleteBlog(id: string) {
     await this.program.methods
-      .delete(id)
+      .deleteBlog(id)
       .accounts({ signer: this.payer.publicKey })
       .rpc();
   }
@@ -197,8 +197,8 @@ describe('blog', () => {
         },
       },
     ]
-    const all_blogs = await myBlog.program.account.blog.all(filter)
-    console.log(all_blogs)
+    const allBlogs = await myBlog.program.account.blog.all(filter)
+    console.log(allBlogs)
   })
 
   it('Create Long Blog', async () => {
